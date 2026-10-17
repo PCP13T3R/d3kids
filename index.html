@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>D3 Kids</title>
+  <meta name="description" content="D3 Kids. Contact of volg ons later op Instagram.">
+  <meta name="theme-color" content="#f7f4ef">
+  <link rel="icon" href="logo-mark.png" type="image/png">
+  <style>
+    :root {
+      --paper: #f7f4ef;
+      --ink: #1a1a1a;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: "Segoe UI", system-ui, sans-serif;
+    }
+
+    main {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 28px;
+      width: min(520px, calc(100% - 40px));
+      padding: 32px 0 48px;
+    }
+
+    .logo {
+      width: min(420px, 100%);
+      height: auto;
+      background: transparent;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 12px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-width: 148px;
+      min-height: 48px;
+      padding: 0 18px;
+      border-radius: 999px;
+      border: 2px solid var(--ink);
+      text-decoration: none;
+      font: inherit;
+      font-weight: 700;
+      font-size: 16px;
+    }
+
+    .btn svg { width: 18px; height: 18px; flex: none; }
+
+    .btn-contact {
+      background: var(--ink);
+      color: #fff;
+    }
+
+    .btn-contact:hover { background: #333; }
+
+    .btn-ig {
+      background: transparent;
+      color: var(--ink);
+    }
+
+    .btn-ig:hover { background: rgba(26, 26, 26, 0.06); }
+
+    .btn:focus-visible {
+      outline: 3px solid #c9a15b;
+      outline-offset: 3px;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .btn-contact:hover, .btn-ig:hover { background: inherit; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <img class="logo" src="logo.png" alt="D3 Kids, d3kids.com">
+    <div class="actions">
+      <a class="btn btn-contact" href="mailto:claeys.vereecken20@hotmail.com?subject=D3%20Kids">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <rect x="3" y="5" width="18" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="2"/>
+          <path d="M4 7l8 6 8-6" fill="none" stroke="currentColor" stroke-width="2"/>
+        </svg>
+        Contact
+      </a>
+      <!-- Instagram-link later: zet de handle in data-instagram, zonder @ -->
+      <a class="btn btn-ig" id="instagram" href="#instagram" data-instagram="" aria-disabled="true" title="Instagram volgt">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="currentColor" stroke-width="2"/>
+          <circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="2"/>
+          <circle cx="17.4" cy="6.6" r="1.1" fill="currentColor"/>
+        </svg>
+        Instagram
+      </a>
+    </div>
+  </main>
+  <script>
+    (function () {
+      var link = document.getElementById("instagram");
+      if (!link) return;
+      var handle = (link.getAttribute("data-instagram") || "").replace(/^@/, "");
+      if (!handle) {
+        link.addEventListener("click", function (event) {
+          event.preventDefault();
+        });
+        return;
+      }
+      link.href = "https://www.instagram.com/" + handle + "/";
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+      link.removeAttribute("aria-disabled");
+      link.removeAttribute("title");
+    })();
+  </script>
+</body>
+</html>
