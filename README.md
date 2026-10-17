@@ -15,12 +15,10 @@ Simple page for d3kids.com. Logo in the center, Contact and Instagram underneath
 
 No product list, prices, ages, or safety marks. Those wait until the shop exists.
 
-## Deploy later (Cloudflare Pages)
+## Live
 
-Domain is already on Cloudflare nameservers. No DNS records yet, so the site is not public.
-
-1. Workers & Pages → Create → Pages → Upload assets.
-2. Upload this folder.
-3. Custom domain: `d3kids.com` and `www.d3kids.com`.
-
-Do not publish until the Instagram handle is filled in, unless you want that button inactive.
+- GitHub: https://github.com/PCP13T3R/d3kids (public)
+- Site: https://d3kids.com and https://www.d3kids.com
+- Worker fallback: https://d3kids.claeys-vereecken20.workers.dev
+- Cloudflare account `Claeys.vereecken20@hotmail.com`, Worker `d3kids`, Git deploy from `main` (`npx wrangler deploy`)
+- Instagram button stays inactive until `data-instagram` is set.
