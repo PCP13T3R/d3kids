@@ -1,0 +1,8 @@
+.git
+.gitignore
+README.md
+logo.jpg
+wrangler.toml
+.assetsignore
+deploy
+d3kids-site.zip
