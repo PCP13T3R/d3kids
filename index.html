@@ -4,13 +4,14 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>D3 Kids</title>
-  <meta name="description" content="D3 Kids. Contact of volg ons later op Instagram.">
+  <meta name="description" content="D3 Kids. 3D-geprint educatief speelgoed. Contact of Instagram.">
   <meta name="theme-color" content="#f7f4ef">
   <link rel="icon" href="logo-mark.png" type="image/png">
   <style>
     :root {
       --paper: #f7f4ef;
       --ink: #1a1a1a;
+      --muted: #5c534c;
     }
 
     * { box-sizing: border-box; }
@@ -18,26 +19,115 @@
     body {
       margin: 0;
       min-height: 100vh;
-      display: grid;
-      place-items: center;
       background: var(--paper);
       color: var(--ink);
       font-family: "Segoe UI", system-ui, sans-serif;
+    }
+
+    .top {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 10px;
+      padding: 18px 22px 0;
+    }
+
+    .tabs { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+
+    .tab, .lang {
+      font: inherit;
+      font-weight: 700;
+      font-size: 15px;
+      color: var(--ink);
+      background: transparent;
+      border: 2px solid transparent;
+      border-radius: 999px;
+      min-height: 40px;
+      padding: 0 14px;
+      cursor: pointer;
+    }
+
+    .tab[aria-selected="true"] {
+      border-color: var(--ink);
+      background: #fff;
+    }
+
+    .tab:hover, .lang:hover { background: rgba(26, 26, 26, 0.05); }
+
+    .lang {
+      border-color: var(--ink);
+      background: #fff;
+      padding-right: 10px;
     }
 
     main {
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 28px;
-      width: min(520px, calc(100% - 40px));
-      padding: 32px 0 48px;
+      width: min(680px, calc(100% - 40px));
+      margin: 0 auto;
+      padding: 12px 0 56px;
+      text-align: center;
+    }
+
+    .stage {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 62vh;
+      transition: min-height 0.45s ease;
+    }
+
+    body[data-view="about"] .stage,
+    body[data-view="shop"] .stage {
+      min-height: 0;
+      margin-top: 8px;
     }
 
     .logo {
-      width: min(420px, 100%);
+      width: min(460px, 88vw);
       height: auto;
       background: transparent;
+      transition: width 0.45s ease;
+    }
+
+    body[data-view="about"] .logo,
+    body[data-view="shop"] .logo {
+      width: min(168px, 40vw);
+    }
+
+    .panel {
+      max-width: 38rem;
+      max-height: 0;
+      opacity: 0;
+      overflow: hidden;
+      transform: translateY(8px);
+      transition: max-height 0.45s ease, opacity 0.35s ease, transform 0.45s ease, margin 0.45s ease;
+    }
+
+    body[data-view="about"] #panel-about,
+    body[data-view="shop"] #panel-shop {
+      max-height: 28rem;
+      opacity: 1;
+      transform: none;
+      margin-top: 22px;
+    }
+
+    .panel p {
+      margin: 0 0 14px;
+      font-size: 18px;
+      line-height: 1.5;
+      color: var(--muted);
+    }
+
+    .panel p:last-child { margin-bottom: 0; }
+
+    .soon {
+      margin: 6px 0 0;
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      color: var(--ink);
     }
 
     .actions {
@@ -45,6 +135,7 @@
       flex-wrap: wrap;
       justify-content: center;
       gap: 12px;
+      margin-top: 28px;
     }
 
     .btn {
@@ -61,46 +152,138 @@
       font: inherit;
       font-weight: 700;
       font-size: 16px;
-    }
-
-    .btn svg { width: 18px; height: 18px; flex: none; }
-
-    .btn-contact {
-      background: var(--ink);
-      color: #fff;
-    }
-
-    .btn-contact:hover { background: #333; }
-
-    .btn-ig {
-      background: transparent;
       color: var(--ink);
     }
 
+    .btn svg { width: 18px; height: 18px; flex: none; }
+    .btn-contact { background: var(--ink); color: #fff; }
+    .btn-contact:hover { background: #333; }
     .btn-ig:hover { background: rgba(26, 26, 26, 0.06); }
 
-    .btn:focus-visible {
+    .tab:focus-visible, .lang:focus-visible, .btn:focus-visible {
       outline: 3px solid #c9a15b;
       outline-offset: 3px;
     }
 
+    .visually-hidden {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      border: 0;
+    }
+
+    .game {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      background: rgba(26, 26, 26, 0.46);
+      z-index: 20;
+    }
+
+    .game.open { display: flex; }
+
+    .game-card {
+      width: min(460px, 100%);
+      background: var(--paper);
+      border-radius: 28px;
+      padding: 18px 18px 16px;
+      box-shadow: 0 24px 60px rgba(26, 26, 26, 0.2);
+    }
+
+    .game-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    .game-bar strong { font-size: 18px; }
+    .game-bar span { color: var(--muted); font-weight: 700; }
+
+    .game-close {
+      border: 0;
+      background: transparent;
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+      min-width: 36px;
+      min-height: 36px;
+      border-radius: 999px;
+    }
+
+    .game-close:hover { background: rgba(26, 26, 26, 0.06); }
+
+    canvas {
+      display: block;
+      width: 100%;
+      height: auto;
+      background: #fff;
+      border-radius: 18px;
+    }
+
+    .game-help {
+      margin: 10px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+      text-align: center;
+    }
+
+    @media (max-width: 720px) {
+      .top { justify-content: center; flex-wrap: wrap; }
+    }
+
     @media (prefers-reduced-motion: reduce) {
-      .btn-contact:hover, .btn-ig:hover { background: inherit; }
+      .stage, .logo, .panel { transition: none; }
     }
   </style>
 </head>
-<body>
+<body data-view="home">
+  <header class="top">
+    <nav class="tabs" aria-label="Pagina">
+      <button class="tab" type="button" id="tab-home" data-view="home" role="tab" aria-selected="true">Home</button>
+      <button class="tab" type="button" id="tab-about" data-view="about" role="tab" aria-selected="false" aria-controls="panel-about">Wie zijn we</button>
+      <button class="tab" type="button" id="tab-shop" data-view="shop" role="tab" aria-selected="false" aria-controls="panel-shop">Shop</button>
+    </nav>
+    <label class="visually-hidden" for="lang" id="lang-label">Taal</label>
+    <select class="lang" id="lang" aria-labelledby="lang-label">
+      <option value="nl">NL</option>
+      <option value="fr">FR</option>
+      <option value="en">ENG</option>
+    </select>
+  </header>
+
   <main>
-    <img class="logo" src="logo.png" alt="D3 Kids, d3kids.com">
+    <div class="stage">
+      <img class="logo" src="logo.png" alt="D3 Kids, d3kids.com">
+    </div>
+
+    <section class="panel" id="panel-about" role="tabpanel" aria-labelledby="tab-about">
+      <p data-key="about1"></p>
+      <p data-key="about2"></p>
+      <p data-key="about3"></p>
+    </section>
+
+    <section class="panel" id="panel-shop" role="tabpanel" aria-labelledby="tab-shop">
+      <p class="soon" data-key="shop"></p>
+    </section>
+
     <div class="actions">
       <a class="btn btn-contact" href="mailto:info@d3kids.com?subject=D3%20Kids">
         <svg viewBox="0 0 24 24" aria-hidden="true">
           <rect x="3" y="5" width="18" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="2"/>
           <path d="M4 7l8 6 8-6" fill="none" stroke="currentColor" stroke-width="2"/>
         </svg>
-        Contact
+        <span data-key="contact">Contact</span>
       </a>
-      <a class="btn btn-ig" id="instagram" href="https://www.instagram.com/d3kids_printing/" data-instagram="d3kids_printing" target="_blank" rel="noopener noreferrer">
+      <a class="btn btn-ig" href="https://www.instagram.com/d3kids_printing/" target="_blank" rel="noopener noreferrer">
         <svg viewBox="0 0 24 24" aria-hidden="true">
           <rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="currentColor" stroke-width="2"/>
           <circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="2"/>
@@ -110,23 +293,295 @@
       </a>
     </div>
   </main>
+
+  <div class="game" id="game" hidden>
+    <div class="game-card" role="dialog" aria-modal="true" aria-labelledby="game-title">
+      <div class="game-bar">
+        <strong id="game-title">Print</strong>
+        <span id="game-score">0</span>
+        <button class="game-close" type="button" id="game-close" aria-label="Sluiten">×</button>
+      </div>
+      <canvas id="board" width="432" height="432"></canvas>
+      <p class="game-help" id="game-help"></p>
+    </div>
+  </div>
+
+  <!-- Tekst aanpassen in TEXTS, daarna verversen. -->
   <script>
-    (function () {
-      var link = document.getElementById("instagram");
-      if (!link) return;
-      var handle = (link.getAttribute("data-instagram") || "").replace(/^@/, "");
-      if (!handle) {
-        link.addEventListener("click", function (event) {
-          event.preventDefault();
-        });
+    var TEXTS = {
+      nl: {
+        homeTab: "Home",
+        aboutTab: "Wie zijn we",
+        shopTab: "Shop",
+        langLabel: "Taal",
+        about1: "Drie kids. Twee ouders. Eén printer die zelden echt uitstaat.",
+        about2: "Tussen de luiers en de schoolpoort door printen we educatief speelgoed. En af en toe een accessoire waar je om moet lachen.",
+        about3: "Gestart eind 2026, toen onze kleinste net één kaarsje uitblies. Ideeën? Schiet ze af. We denken graag mee. Een vraag? Contact, en we antwoorden zelf.",
+        shop: "De shop? Die printen we nog. Komt eraan!",
+        contact: "Contact",
+        gameTitle: "Printkop",
+        gameHelp: "Pijltjes of WASD. De kop eet filament.",
+        gameOver: "Vastgelopen. Spatie = opnieuw."
+      },
+      fr: {
+        homeTab: "Accueil",
+        aboutTab: "Qui sommes-nous",
+        shopTab: "Boutique",
+        langLabel: "Langue",
+        about1: "Trois enfants. Deux parents. Une imprimante qui ne s'arrête presque jamais.",
+        about2: "Entre les couches et la porte de l'école, on imprime des jouets éducatifs en 3D. Et parfois un accessoire qui fait sourire.",
+        about3: "On a commencé fin 2026, juste après le premier anniversaire de notre petit dernier. Des idées ? Envoyez-les. On aime réfléchir avec vous. Une question ? Écrivez-nous.",
+        shop: "La boutique ? On l'imprime encore. Ça arrive !",
+        contact: "Contact",
+        gameTitle: "Buse",
+        gameHelp: "Flèches ou WASD. La buse mange le filament.",
+        gameOver: "Bloqué. Espace = recommencer."
+      },
+      en: {
+        homeTab: "Home",
+        aboutTab: "Who we are",
+        shopTab: "Shop",
+        langLabel: "Language",
+        about1: "Three kids. Two parents. One printer that rarely clocks out.",
+        about2: "Between nappies and the school run, we 3D-print educational toys. And the odd accessory that makes you grin.",
+        about3: "We started at the end of 2026, right after our youngest blew out one candle. Ideas welcome. We like thinking along. A question? Just say hi.",
+        shop: "The shop? Still printing. Coming soon!",
+        contact: "Contact",
+        gameTitle: "Print head",
+        gameHelp: "Arrows or WASD. The head eats filament.",
+        gameOver: "Jammed. Space = again."
+      }
+    };
+
+    var lang = document.getElementById("lang");
+    var tabs = document.querySelectorAll(".tab");
+
+    function applyLanguage(code) {
+      var t = TEXTS[code] || TEXTS.nl;
+      document.documentElement.lang = code === "en" ? "en" : code;
+      document.getElementById("lang-label").textContent = t.langLabel;
+      document.getElementById("tab-home").textContent = t.homeTab;
+      document.getElementById("tab-about").textContent = t.aboutTab;
+      document.getElementById("tab-shop").textContent = t.shopTab;
+      document.querySelectorAll("[data-key]").forEach(function (node) {
+        node.textContent = t[node.getAttribute("data-key")] || "";
+      });
+    }
+
+    function show(view) {
+      document.body.setAttribute("data-view", view);
+      tabs.forEach(function (tab) {
+        tab.setAttribute("aria-selected", tab.getAttribute("data-view") === view ? "true" : "false");
+      });
+    }
+
+    tabs.forEach(function (tab) {
+      tab.addEventListener("click", function () {
+        show(tab.getAttribute("data-view"));
+      });
+    });
+
+    lang.addEventListener("change", function () { applyLanguage(lang.value); paintHud(); });
+    applyLanguage("nl");
+    show("home");
+
+    var gameEl = document.getElementById("game");
+    var canvas = document.getElementById("board");
+    var ctx = canvas.getContext("2d");
+    var cols = 18;
+    var rows = 18;
+    var typed = "";
+    var timer = 0;
+    var state = null;
+    var colors = ["#e15b3a", "#f0b429", "#2f8f6b", "#d45d7a"];
+
+    function paintHud() {
+      var t = TEXTS[lang.value] || TEXTS.nl;
+      document.getElementById("game-title").textContent = t.gameTitle;
+      document.getElementById("game-score").textContent = state ? String(state.score) : "0";
+      document.getElementById("game-help").textContent = state && state.over ? t.gameOver : t.gameHelp;
+    }
+
+    function cell() { return canvas.width / cols; }
+
+    function emptySpot(snake) {
+      var spot;
+      do {
+        spot = { x: Math.floor(Math.random() * cols), y: Math.floor(Math.random() * rows) };
+      } while (snake.some(function (part) { return part.x === spot.x && part.y === spot.y; }));
+      return spot;
+    }
+
+    function freshFood(snake) {
+      var spot = emptySpot(snake);
+      spot.color = colors[Math.floor(Math.random() * colors.length)];
+      spot.angle = Math.random() * Math.PI;
+      return spot;
+    }
+
+    function resetGame() {
+      state = {
+        snake: [{ x: 8, y: 9 }, { x: 7, y: 9 }, { x: 6, y: 9 }],
+        dir: { x: 1, y: 0 },
+        next: { x: 1, y: 0 },
+        score: 0,
+        over: false
+      };
+      state.food = freshFood(state.snake);
+      paintHud();
+      draw();
+    }
+
+    function openGame() {
+      gameEl.hidden = false;
+      gameEl.classList.add("open");
+      resetGame();
+      window.clearInterval(timer);
+      timer = window.setInterval(tick, 150);
+    }
+
+    function closeGame() {
+      window.clearInterval(timer);
+      gameEl.classList.remove("open");
+      gameEl.hidden = true;
+      state = null;
+    }
+
+    function turn(x, y) {
+      if (!state || state.over) return;
+      if (x === -state.dir.x && y === -state.dir.y) return;
+      state.next = { x: x, y: y };
+    }
+
+    function tick() {
+      if (!state || state.over) return;
+      state.dir = state.next;
+      var head = {
+        x: state.snake[0].x + state.dir.x,
+        y: state.snake[0].y + state.dir.y
+      };
+      var willEat = head.x === state.food.x && head.y === state.food.y;
+      var body = willEat ? state.snake : state.snake.slice(0, -1);
+      var hitWall = head.x < 0 || head.y < 0 || head.x >= cols || head.y >= rows;
+      var hitSelf = body.some(function (part) { return part.x === head.x && part.y === head.y; });
+      if (hitWall || hitSelf) {
+        state.over = true;
+        paintHud();
+        draw();
         return;
       }
-      link.href = "https://www.instagram.com/" + handle + "/";
-      link.target = "_blank";
-      link.rel = "noopener noreferrer";
-      link.removeAttribute("aria-disabled");
-      link.removeAttribute("title");
-    })();
+      state.snake.unshift(head);
+      if (head.x === state.food.x && head.y === state.food.y) {
+        state.score += 1;
+        state.food = freshFood(state.snake);
+        paintHud();
+      } else {
+        state.snake.pop();
+      }
+      draw();
+    }
+
+    function roundFilament(x, y, w, h, r) {
+      ctx.beginPath();
+      ctx.moveTo(x + r, y);
+      ctx.arcTo(x + w, y, x + w, y + h, r);
+      ctx.arcTo(x + w, y + h, x, y + h, r);
+      ctx.arcTo(x, y + h, x, y, r);
+      ctx.arcTo(x, y, x + w, y, r);
+      ctx.closePath();
+      ctx.fill();
+    }
+
+    function drawNozzle(cx, cy, dir, size) {
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.rotate(Math.atan2(dir.y, dir.x) + Math.PI / 2);
+      ctx.fillStyle = "#1a1a1a";
+      ctx.fillRect(-size * 0.28, -size * 0.46, size * 0.56, size * 0.18);
+      ctx.beginPath();
+      ctx.moveTo(-size * 0.36, -size * 0.28);
+      ctx.lineTo(size * 0.36, -size * 0.28);
+      ctx.lineTo(size * 0.16, size * 0.18);
+      ctx.lineTo(-size * 0.16, size * 0.18);
+      ctx.closePath();
+      ctx.fill();
+      ctx.beginPath();
+      ctx.moveTo(-size * 0.1, size * 0.18);
+      ctx.lineTo(size * 0.1, size * 0.18);
+      ctx.lineTo(0, size * 0.42);
+      ctx.closePath();
+      ctx.fill();
+      ctx.restore();
+    }
+
+    function draw() {
+      if (!state) return;
+      var s = cell();
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = "#fffdfb";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      var food = state.food;
+      ctx.save();
+      ctx.translate((food.x + 0.5) * s, (food.y + 0.5) * s);
+      ctx.rotate(food.angle);
+      ctx.fillStyle = food.color;
+      roundFilament(-s * 0.34, -s * 0.12, s * 0.68, s * 0.24, s * 0.12);
+      ctx.restore();
+
+      ctx.strokeStyle = "#1a1a1a";
+      ctx.lineWidth = s * 0.42;
+      ctx.lineCap = "round";
+      ctx.lineJoin = "round";
+      ctx.beginPath();
+      state.snake.forEach(function (part, index) {
+        var x = (part.x + 0.5) * s;
+        var y = (part.y + 0.5) * s;
+        if (index === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      });
+      ctx.stroke();
+
+      var head = state.snake[0];
+      drawNozzle((head.x + 0.5) * s, (head.y + 0.5) * s, state.dir, s * 0.92);
+
+      if (state.over) {
+        ctx.fillStyle = "rgba(247, 244, 239, 0.72)";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+      }
+    }
+
+    document.getElementById("game-close").addEventListener("click", closeGame);
+    gameEl.addEventListener("click", function (event) {
+      if (event.target === gameEl) closeGame();
+    });
+
+    document.addEventListener("keydown", function (event) {
+      var tag = event.target && event.target.tagName;
+      if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
+
+      if (gameEl.classList.contains("open")) {
+        var key = event.key;
+        if (key === "Escape") closeGame();
+        else if (key === "ArrowUp" || key === "w" || key === "W") turn(0, -1);
+        else if (key === "ArrowDown" || key === "s" || key === "S") turn(0, 1);
+        else if (key === "ArrowLeft" || key === "a" || key === "A") turn(-1, 0);
+        else if (key === "ArrowRight" || key === "d" || key === "D") turn(1, 0);
+        else if ((key === " " || key === "Enter") && state && state.over) resetGame();
+        if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", " "].indexOf(key) !== -1) event.preventDefault();
+        return;
+      }
+
+      if (event.key.length !== 1 || !/[a-z]/i.test(event.key)) {
+        typed = "";
+        return;
+      }
+      typed = (typed + event.key).slice(-5).toLowerCase();
+      if (typed === "print") {
+        typed = "";
+        openGame();
+      }
+    });
   </script>
 </body>
 </html>

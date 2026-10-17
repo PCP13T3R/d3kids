@@ -6,3 +6,4 @@ wrangler.toml
 .assetsignore
 deploy
 d3kids-site.zip
+preview.html
