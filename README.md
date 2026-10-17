@@ -8,7 +8,7 @@ Simple page for d3kids.com. Logo in the center, Contact and Instagram underneath
 - `logo.png` — full lockup, transparent background (from `logo.jpg`)
 - `logo-mark.png` — circle only, transparent, used as favicon
 - `favicon.svg`
-- Contact: `claeys.vereecken20@hotmail.com`
+- Contact: `info@d3kids.com`
 - Instagram: https://www.instagram.com/d3kids_printing/
 
 ## Not claimed on the page
@@ -20,5 +20,5 @@ No product list, prices, ages, or safety marks. Those wait until the shop exists
 - GitHub: https://github.com/PCP13T3R/d3kids (public)
 - Site: https://d3kids.com and https://www.d3kids.com
 - Worker fallback: https://d3kids.claeys-vereecken20.workers.dev
-- Cloudflare account `Claeys.vereecken20@hotmail.com`, Worker `d3kids`, Git deploy from `main` (`npx wrangler deploy`)
+- Cloudflare Worker `d3kids`, Git deploy from `main` (`npx wrangler deploy`)
 - Instagram: https://www.instagram.com/d3kids_printing/
