@@ -47,6 +47,9 @@
       cursor: pointer;
     }
 
+    #tab-shop,
+    #panel-shop { display: none !important; }
+
     .tab[aria-selected="true"] {
       border-color: var(--ink);
       background: #fff;
@@ -250,7 +253,7 @@
     <nav class="tabs" aria-label="Pagina">
       <button class="tab" type="button" id="tab-home" data-view="home" role="tab" aria-selected="true">Home</button>
       <button class="tab" type="button" id="tab-about" data-view="about" role="tab" aria-selected="false" aria-controls="panel-about">Wie zijn we</button>
-      <button class="tab" type="button" id="tab-shop" data-view="shop" role="tab" aria-selected="false" aria-controls="panel-shop">Shop</button>
+      <button class="tab" type="button" id="tab-shop" data-view="shop" role="tab" aria-selected="false" aria-controls="panel-shop" hidden>Shop</button>
     </nav>
     <label class="visually-hidden" for="lang" id="lang-label">Taal</label>
     <select class="lang" id="lang" aria-labelledby="lang-label">
@@ -271,7 +274,7 @@
       <p data-key="about3"></p>
     </section>
 
-    <section class="panel" id="panel-shop" role="tabpanel" aria-labelledby="tab-shop">
+    <section class="panel" id="panel-shop" role="tabpanel" aria-labelledby="tab-shop" hidden>
       <p class="soon" data-key="shop"></p>
     </section>
 
