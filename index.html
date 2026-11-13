@@ -106,6 +106,7 @@
       position: relative;
       width: 100%;
       aspect-ratio: 704 / 695;
+      overflow: hidden;
     }
 
     .logo {
@@ -118,6 +119,7 @@
 
     .scene { clip-path: inset(97% 0 0 0); }
     .nozzle { transform: translateY(58%); }
+    .scene, .nozzle { pointer-events: none; }
     .complete { opacity: 0; }
 
     .lockup.is-printing .scene {
@@ -131,6 +133,7 @@
     .lockup.is-ready .complete { opacity: 1; }
     .lockup.is-ready .scene,
     .lockup.is-ready .nozzle { opacity: 0; }
+    .lockup.is-ready .nozzle { transform: none; }
 
     @keyframes nozzle-up {
       0% { transform: translateY(58%); }
