@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>D3 Kids</title>
-  <meta name="description" content="D3 Kids. 3D-geprint educatief speelgoed. Contact of Instagram.">
+  <meta name="description" content="D3 Kids. Sensorisch speelgoed, geprint met Georgette. Zeg hallo of volg ons op Instagram.">
   <meta name="theme-color" content="#f7f4ef">
   <link rel="icon" href="logo-mark.png" type="image/png">
   <style>
@@ -82,21 +82,98 @@
     }
 
     body[data-view="about"] .stage,
-    body[data-view="shop"] .stage {
+    body[data-view="shop"] .stage,
+    body[data-view="concept"] .stage {
       min-height: 0;
       margin-top: 8px;
     }
 
-    .logo {
+    .lockup {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
       width: min(460px, 88vw);
-      height: auto;
-      background: transparent;
       transition: width 0.45s ease;
     }
 
-    body[data-view="about"] .logo,
-    body[data-view="shop"] .logo {
+    body[data-view="about"] .lockup,
+    body[data-view="shop"] .lockup,
+    body[data-view="concept"] .lockup {
       width: min(168px, 40vw);
+    }
+
+    .print-frame {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 704 / 695;
+    }
+
+    .logo {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      background: transparent;
+    }
+
+    .scene { clip-path: inset(97% 0 0 0); }
+    .nozzle { transform: translateY(58%); }
+    .complete { opacity: 0; }
+
+    .lockup.is-printing .scene {
+      animation: scene-up 2.7s cubic-bezier(0.42, 0, 0.2, 1) forwards;
+    }
+
+    .lockup.is-printing .nozzle {
+      animation: nozzle-up 2.7s cubic-bezier(0.42, 0, 0.2, 1) forwards;
+    }
+
+    .lockup.is-ready .complete { opacity: 1; }
+    .lockup.is-ready .scene,
+    .lockup.is-ready .nozzle { opacity: 0; }
+
+    @keyframes nozzle-up {
+      0% { transform: translateY(58%); }
+      78% { transform: translateY(0); }
+      100% { transform: translateY(0); }
+    }
+
+    @keyframes scene-up {
+      0% { clip-path: inset(97% 0 0 0); }
+      78% { clip-path: inset(39% 0 0 0); }
+      100% { clip-path: inset(0 0 0 0); }
+    }
+
+    .wordmark {
+      margin: 10px 0 0;
+      font-size: clamp(32px, 6vw, 52px);
+      font-weight: 800;
+      letter-spacing: -0.045em;
+      line-height: 1;
+      opacity: 0;
+      transform: translateY(10px);
+    }
+
+    .lockup.is-ready .wordmark {
+      opacity: 1;
+      transform: none;
+      transition: opacity 0.45s ease, transform 0.45s ease;
+    }
+
+    body:not([data-view="home"]) .wordmark { display: none; }
+
+    .actions {
+      opacity: 0;
+      transform: translateY(10px);
+      pointer-events: none;
+    }
+
+    body.is-ready .actions,
+    body:not([data-view="home"]) .actions {
+      opacity: 1;
+      transform: none;
+      pointer-events: auto;
+      transition: opacity 0.45s ease, transform 0.45s ease;
     }
 
     .panel {
@@ -109,11 +186,16 @@
     }
 
     body[data-view="about"] #panel-about,
-    body[data-view="shop"] #panel-shop {
+    body[data-view="shop"] #panel-shop,
+    body[data-view="concept"] #panel-concept {
       max-height: 28rem;
       opacity: 1;
       transform: none;
       margin-top: 22px;
+    }
+
+    body[data-view="concept"] #panel-concept {
+      max-height: 140rem;
     }
 
     .panel p {
@@ -124,6 +206,12 @@
     }
 
     .panel p:last-child { margin-bottom: 0; }
+
+    .panel p.ask {
+      margin-top: 18px;
+      color: var(--ink);
+      font-weight: 700;
+    }
 
     .soon {
       margin: 6px 0 0;
@@ -252,8 +340,10 @@
     }
 
     @media (prefers-reduced-motion: reduce) {
-      .stage, .logo, .panel { transition: none; }
+      .stage, .logo, .panel, .lockup, .wordmark, .actions { transition: none; }
       .wave { animation: none; }
+      .lockup.is-printing .scene,
+      .lockup.is-printing .nozzle { animation: none; }
     }
   </style>
 </head>
@@ -262,6 +352,7 @@
     <nav class="tabs" aria-label="Pagina">
       <button class="tab" type="button" id="tab-home" data-view="home" role="tab" aria-selected="true">Home</button>
       <button class="tab" type="button" id="tab-about" data-view="about" role="tab" aria-selected="false" aria-controls="panel-about">Wie zijn we</button>
+      <button class="tab" type="button" id="tab-concept" data-view="concept" role="tab" aria-selected="false" aria-controls="panel-concept">Concept</button>
       <button class="tab" type="button" id="tab-shop" data-view="shop" role="tab" aria-selected="false" aria-controls="panel-shop" hidden>Shop</button>
     </nav>
     <label class="visually-hidden" for="lang" id="lang-label">Taal</label>
@@ -274,13 +365,33 @@
 
   <main>
     <div class="stage">
-      <img class="logo" src="logo.png" alt="D3 Kids, d3kids.com">
+      <div class="lockup" id="lockup">
+        <div class="print-frame">
+          <img class="logo scene" src="logo-scene.png" alt="">
+          <img class="logo nozzle" src="logo-nozzle.png" alt="">
+          <img class="logo complete" src="logo-mark.png" alt="D3 Kids">
+        </div>
+        <p class="wordmark" id="wordmark">d3kids.com</p>
+      </div>
     </div>
 
     <section class="panel" id="panel-about" role="tabpanel" aria-labelledby="tab-about">
       <p data-key="about1"></p>
       <p data-key="about2"></p>
-      <p data-key="about3"></p>
+      <p class="ask" data-key="about3"></p>
+    </section>
+
+    <section class="panel" id="panel-concept" role="tabpanel" aria-labelledby="tab-concept">
+      <p data-key="concept1"></p>
+      <p class="ask" data-key="concept2"></p>
+      <p data-key="concept3"></p>
+      <p data-key="concept4"></p>
+      <p class="ask" data-key="concept5"></p>
+      <p data-key="concept6"></p>
+      <p data-key="concept7"></p>
+      <p data-key="concept8"></p>
+      <p data-key="concept9"></p>
+      <p data-key="concept10"></p>
     </section>
 
     <section class="panel" id="panel-shop" role="tabpanel" aria-labelledby="tab-shop" hidden>
@@ -326,11 +437,22 @@
       nl: {
         homeTab: "Home",
         aboutTab: "Wie zijn we",
+        conceptTab: "Concept",
         shopTab: "Shop",
         langLabel: "Taal",
-        about1: "Drie kids. Twee ouders. Eén printer die zelden echt uitstaat.",
-        about2: "Tussen de luiers en de schoolpoort door printen we educatief speelgoed. En af en toe een accessoire waar je om moet lachen.",
-        about3: "Gestart eind 2026, toen onze kleinste net één kaarsje uitblies. Ideeën? Schiet ze af. We denken graag mee. Een vraag? Contact, en we antwoorden zelf.",
+        about1: "Drie kids (De Drei Kids). Twee ouders. Eén printer die zelden uitstaat.",
+        about2: "Tussen de luiers en de schoolpoort door printen we sensorisch speelgoed. Met een flinke dosis creativiteit, nieuwsgierigheid en een klein beetje gezonde chaos bouwen we aan ons eigen 3D-avontuur!",
+        concept1: "Welkom in ons creatieve avontuur! Een avontuur dat we samen beleven met onze 3D-printer Georgette en onze drie kids. 🖨️💛",
+        concept2: "Maar wat mag je hier eigenlijk verwachten?",
+        concept3: "Ons concept is simpel: samen met onze drie kindjes ontdekken, creëren en experimenteren we met sensorisch speelgoed in allerlei leuke thema's.",
+        concept4: "Van de eerste ideetjes en eigen ontwerpen tot het uiteindelijke resultaat én natuurlijk onze kindjes die ermee aan de slag gaan. Je krijgt het allemaal mee!",
+        concept5: "En wat zijn onze plannen?",
+        concept6: "Momenteel volgen we een opleiding om onze kennis over 3D-printen verder uit te breiden. Ondertussen gaan we volop aan de slag met eigen ontwerpen, creatieve ideeën en nieuwe thema's.",
+        concept7: "Maar we doen dit avontuur graag samen met jullie! ❤️",
+        concept8: "Heb je zelf leuke ideeën, suggesties of thema's die je graag eens voorbij ziet komen? Laat het ons zeker weten! We staan altijd open voor inspiratie.",
+        concept9: "Volg ons dus zeker en ontdek samen met ons wat er allemaal mogelijk is met een beetje creativiteit, een 3D-printer en heel veel fantasie!",
+        concept10: "Dit is nog maar het begin! ✨",
+        about3: "Welkom bij d3kids!",
         shop: "De shop? Die printen we nog. Komt eraan!",
         contact: "Zeg hallo",
         gameTitle: "Printkop",
@@ -340,11 +462,22 @@
       fr: {
         homeTab: "Accueil",
         aboutTab: "Qui sommes-nous",
+        conceptTab: "Concept",
         shopTab: "Boutique",
         langLabel: "Langue",
-        about1: "Trois enfants. Deux parents. Une imprimante qui ne s'arrête presque jamais.",
-        about2: "Entre les couches et la porte de l'école, on imprime des jouets éducatifs en 3D. Et parfois un accessoire qui fait sourire.",
-        about3: "On a commencé fin 2026, juste après le premier anniversaire de notre petit dernier. Des idées ? Envoyez-les. On aime réfléchir avec vous. Une question ? Écrivez-nous.",
+        about1: "Trois enfants (De Drei Kids). Deux parents. Une imprimante qui s'arrête rarement.",
+        about2: "Entre les couches et la porte de l'école, on imprime des jouets sensoriels. Avec une bonne dose de créativité, de curiosité et un petit peu de chaos sain, on construit notre propre aventure 3D !",
+        concept1: "Bienvenue dans notre aventure créative ! Une aventure que nous vivons ensemble avec notre imprimante 3D Georgette et nos trois enfants. 🖨️💛",
+        concept2: "Mais à quoi pouvez-vous vous attendre ici ?",
+        concept3: "Notre concept est simple : avec nos trois enfants, nous découvrons, créons et expérimentons des jouets sensoriels sur plein de thèmes amusants.",
+        concept4: "Des premières idées et de nos propres designs jusqu'au résultat final, et bien sûr nos enfants qui s'y mettent. Vous suivez tout !",
+        concept5: "Et quels sont nos projets ?",
+        concept6: "En ce moment, nous suivons une formation pour approfondir nos connaissances en impression 3D. En parallèle, nous travaillons à fond sur nos propres designs, des idées créatives et de nouveaux thèmes.",
+        concept7: "Mais nous aimons vivre cette aventure avec vous ! ❤️",
+        concept8: "Vous avez de chouettes idées, des suggestions ou des thèmes que vous aimeriez voir passer ? Dites-le-nous ! Nous sommes toujours ouverts à l'inspiration.",
+        concept9: "Suivez-nous et découvrez avec nous tout ce qui est possible avec un peu de créativité, une imprimante 3D et beaucoup d'imagination !",
+        concept10: "Ce n'est que le début ! ✨",
+        about3: "Bienvenue chez d3kids !",
         shop: "La boutique ? On l'imprime encore. Ça arrive !",
         contact: "Dites bonjour",
         gameTitle: "Buse",
@@ -354,11 +487,22 @@
       en: {
         homeTab: "Home",
         aboutTab: "Who we are",
+        conceptTab: "Concept",
         shopTab: "Shop",
         langLabel: "Language",
-        about1: "Three kids. Two parents. One printer that rarely clocks out.",
-        about2: "Between nappies and the school run, we 3D-print educational toys. And the odd accessory that makes you grin.",
-        about3: "We started at the end of 2026, right after our youngest blew out one candle. Ideas welcome. We like thinking along. A question? Just say hi.",
+        about1: "Three kids (De Drei Kids). Two parents. One printer that rarely switches off.",
+        about2: "Between nappies and the school run, we print sensory toys. With a good dose of creativity, curiosity and a little healthy chaos, we're building our own 3D adventure!",
+        concept1: "Welcome to our creative adventure! An adventure we share with our 3D printer Georgette and our three kids. 🖨️💛",
+        concept2: "So what can you expect here?",
+        concept3: "Our concept is simple: together with our three kids, we discover, create and experiment with sensory toys in all kinds of fun themes.",
+        concept4: "From the first little ideas and our own designs to the finished result, and of course our kids getting stuck in. You get to follow all of it!",
+        concept5: "And what are our plans?",
+        concept6: "Right now we're taking a course to grow what we know about 3D printing. Meanwhile we're going all in on our own designs, creative ideas and new themes.",
+        concept7: "But we like doing this adventure with you! ❤️",
+        concept8: "Got fun ideas, suggestions or themes you'd love to see? Tell us! We're always open to inspiration.",
+        concept9: "So follow along and discover with us what's possible with a bit of creativity, a 3D printer and a lot of imagination!",
+        concept10: "This is only the beginning! ✨",
+        about3: "Welcome to d3kids!",
         shop: "The shop? Still printing. Coming soon!",
         contact: "Say HI",
         gameTitle: "Print head",
@@ -376,10 +520,37 @@
       document.getElementById("lang-label").textContent = t.langLabel;
       document.getElementById("tab-home").textContent = t.homeTab;
       document.getElementById("tab-about").textContent = t.aboutTab;
+      document.getElementById("tab-concept").textContent = t.conceptTab;
       document.getElementById("tab-shop").textContent = t.shopTab;
       document.querySelectorAll("[data-key]").forEach(function (node) {
         node.textContent = t[node.getAttribute("data-key")] || "";
       });
+    }
+
+    var printTimer = 0;
+    var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    function finishPrint() {
+      var lockup = document.getElementById("lockup");
+      lockup.classList.remove("is-printing");
+      lockup.classList.add("is-ready");
+      document.body.classList.add("is-ready");
+      document.getElementById("wordmark").removeAttribute("aria-hidden");
+    }
+
+    function playPrint() {
+      var lockup = document.getElementById("lockup");
+      window.clearTimeout(printTimer);
+      lockup.classList.remove("is-printing", "is-ready");
+      document.body.classList.remove("is-ready");
+      document.getElementById("wordmark").setAttribute("aria-hidden", "true");
+      if (reduceMotion) {
+        finishPrint();
+        return;
+      }
+      void lockup.offsetWidth;
+      lockup.classList.add("is-printing");
+      printTimer = window.setTimeout(finishPrint, 2750);
     }
 
     function show(view) {
@@ -387,6 +558,14 @@
       tabs.forEach(function (tab) {
         tab.setAttribute("aria-selected", tab.getAttribute("data-view") === view ? "true" : "false");
       });
+      if (view === "home") {
+        playPrint();
+        return;
+      }
+      window.clearTimeout(printTimer);
+      document.getElementById("lockup").classList.remove("is-printing");
+      document.getElementById("lockup").classList.add("is-ready");
+      document.body.classList.add("is-ready");
     }
 
     tabs.forEach(function (tab) {
